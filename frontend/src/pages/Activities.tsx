@@ -29,6 +29,8 @@ export default function Activities() {
   const [type, setType] = useState('');
   const [sortBy, setSortBy] = useState('date');
   const [sortOrder, setSortOrder] = useState('desc');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   
   // Form
   const [formData, setFormData] = useState({
@@ -57,7 +59,9 @@ export default function Activities() {
         sortBy,
         sortOrder,
         ...(search && { search }),
-        ...(type && { type })
+        ...(type && { type }),
+        ...(startDate && { startDate }),
+        ...(endDate && { endDate })
       });
 
       const response = await fetch(`${API_URL}/api/activities?${params}`, {
@@ -81,7 +85,85 @@ export default function Activities() {
 
   useEffect(() => {
     fetchActivities();
-  }, [page, sortBy, sortOrder, search, type]);
+  }, [page, sortBy, sortOrder, search, type, startDate, endDate]);
+
+  const exportToCSV = () => {
+    if (activities.length === 0) {
+      alert('No activities to export');
+      return;
+    }
+
+    const headers = ['Date', 'Type', 'Name', 'Description', 'Amount', 'Unit', 'CO2 (kg)'];
+    const rows = activities.map(a => [
+      new Date(a.date).toLocaleDateString(),
+      a.type,
+      a.name,
+      a.description || '',
+      a.amount,
+      a.unit,
+      a.carbonCO2
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `greentrack-activities-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const loadTemplate = (template: string) => {
+    const templates: any = {
+      'car-commute': {
+        type: 'travel',
+        name: 'Car Commute',
+        description: 'Daily car commute',
+        amount: '20',
+        unit: 'km',
+        carbonCO2: '4.6',
+        date: new Date().toISOString().split('T')[0]
+      },
+      'flight': {
+        type: 'travel',
+        name: 'Flight',
+        description: 'Air travel',
+        amount: '500',
+        unit: 'km',
+        carbonCO2: '115',
+        date: new Date().toISOString().split('T')[0]
+      },
+      'beef-meal': {
+        type: 'food',
+        name: 'Beef Meal',
+        description: 'Beef-based meal',
+        amount: '0.5',
+        unit: 'kg',
+        carbonCO2: '13.5',
+        date: new Date().toISOString().split('T')[0]
+      },
+      'electricity': {
+        type: 'energy',
+        name: 'Home Electricity',
+        description: 'Daily electricity usage',
+        amount: '10',
+        unit: 'kWh',
+        carbonCO2: '4.5',
+        date: new Date().toISOString().split('T')[0]
+      }
+    };
+
+    if (templates[template]) {
+      setFormData(templates[template]);
+      setShowModal(true);
+      setEditingActivity(null);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -223,9 +305,40 @@ export default function Activities() {
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Quick Templates */}
+        <div className="bg-white rounded-lg shadow p-4 mb-4">
+          <h3 className="text-sm font-semibold text-gray-700 mb-2">Quick Add Templates</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <button
+              onClick={() => loadTemplate('car-commute')}
+              className="px-3 py-2 bg-blue-50 text-blue-700 rounded hover:bg-blue-100 transition text-sm font-medium"
+            >
+              🚗 Car Commute
+            </button>
+            <button
+              onClick={() => loadTemplate('flight')}
+              className="px-3 py-2 bg-blue-50 text-blue-700 rounded hover:bg-blue-100 transition text-sm font-medium"
+            >
+              ✈️ Flight
+            </button>
+            <button
+              onClick={() => loadTemplate('beef-meal')}
+              className="px-3 py-2 bg-orange-50 text-orange-700 rounded hover:bg-orange-100 transition text-sm font-medium"
+            >
+              🍖 Beef Meal
+            </button>
+            <button
+              onClick={() => loadTemplate('electricity')}
+              className="px-3 py-2 bg-yellow-50 text-yellow-700 rounded hover:bg-yellow-100 transition text-sm font-medium"
+            >
+              💡 Electricity
+            </button>
+          </div>
+        </div>
+
         {/* Filters and Search */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
             <input
               type="text"
               placeholder="Search activities..."
@@ -245,32 +358,59 @@ export default function Activities() {
               <option value="energy">Energy</option>
             </select>
 
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-600 focus:border-green-600 text-sm"
-            >
-              <option value="date">Sort by Date</option>
-              <option value="carbonCO2">Sort by CO₂</option>
-              <option value="name">Sort by Name</option>
-            </select>
+            <div className="flex gap-2">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-600 focus:border-green-600 text-sm"
+              >
+                <option value="date">Sort by Date</option>
+                <option value="carbonCO2">Sort by CO₂</option>
+                <option value="name">Sort by Name</option>
+              </select>
 
-            <select
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-600 focus:border-green-600 text-sm"
-            >
-              <option value="desc">Descending</option>
-              <option value="asc">Ascending</option>
-            </select>
+              <select
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-600 focus:border-green-600 text-sm"
+              >
+                <option value="desc">↓</option>
+                <option value="asc">↑</option>
+              </select>
+            </div>
           </div>
 
-          <button
-            onClick={() => { setShowModal(true); setEditingActivity(null); resetForm(); }}
-            className="w-full bg-green-700 text-white py-2 rounded hover:bg-green-800 transition font-medium"
-          >
-            + Add New Activity
-          </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+            <input
+              type="date"
+              placeholder="Start Date"
+              value={startDate}
+              onChange={(e) => { setStartDate(e.target.value); setPage(1); }}
+              className="px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-600 focus:border-green-600 text-sm"
+            />
+            <input
+              type="date"
+              placeholder="End Date"
+              value={endDate}
+              onChange={(e) => { setEndDate(e.target.value); setPage(1); }}
+              className="px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-600 focus:border-green-600 text-sm"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => { setShowModal(true); setEditingActivity(null); resetForm(); }}
+              className="bg-green-700 text-white py-2 rounded hover:bg-green-800 transition font-medium"
+            >
+              + Add New Activity
+            </button>
+            <button
+              onClick={exportToCSV}
+              className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition font-medium"
+            >
+              📥 Export to CSV
+            </button>
+          </div>
         </div>
 
         {/* Activities List */}

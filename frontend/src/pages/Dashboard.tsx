@@ -12,6 +12,14 @@ interface Stats {
   lastMonthCO2: number;
 }
 
+interface Activity {
+  id: string;
+  type: string;
+  name: string;
+  carbonCO2: number;
+  date: string;
+}
+
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
   const [stats, setStats] = useState<Stats>({
@@ -23,6 +31,7 @@ export default function Dashboard() {
     thisMonthCO2: 0,
     lastMonthCO2: 0
   });
+  const [recentActivities, setRecentActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -77,10 +86,22 @@ export default function Dashboard() {
         thisMonthCO2: Math.round(thisMonth * 100) / 100,
         lastMonthCO2: Math.round(lastMonth * 100) / 100
       });
+
+      // Get recent 5 activities
+      setRecentActivities(activities.slice(0, 5));
       setLoading(false);
     } catch (error) {
       console.error(error);
       setLoading(false);
+    }
+  };
+
+  const getTypeIcon = (type: string) => {
+    switch(type) {
+      case 'travel': return '🚗';
+      case 'food': return '🍽️';
+      case 'energy': return '⚡';
+      default: return '📊';
     }
   };
 
@@ -252,30 +273,79 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button
-            onClick={() => navigate('/activities')}
-            className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition text-left border-2 border-transparent hover:border-green-600"
-          >
-            <div className="text-3xl mb-2">📝</div>
-            <h3 className="text-lg font-bold text-gray-900 mb-1">Add Activity</h3>
-            <p className="text-sm text-gray-600">Track a new carbon emission activity</p>
-          </button>
+        {/* Recent Activities & Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Recent Activities */}
+          <div className="md:col-span-2 bg-white rounded-lg shadow p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold text-gray-900">Recent Activities</h3>
+              <button
+                onClick={() => navigate('/activities')}
+                className="text-sm text-green-600 hover:text-green-700 font-medium"
+              >
+                View All →
+              </button>
+            </div>
+            {recentActivities.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <p className="mb-2">No activities yet</p>
+                <button
+                  onClick={() => navigate('/activities')}
+                  className="text-green-600 hover:text-green-700 font-medium"
+                >
+                  Add your first activity
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {recentActivities.map((activity) => (
+                  <div
+                    key={activity.id}
+                    className="flex items-center justify-between p-3 border border-gray-200 rounded hover:border-green-600 transition"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <span className="text-2xl">{getTypeIcon(activity.type)}</span>
+                      <div>
+                        <p className="font-semibold text-gray-900">{activity.name}</p>
+                        <p className="text-xs text-gray-500">{new Date(activity.date).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-red-600">{activity.carbonCO2} kg</p>
+                      <p className="text-xs text-gray-500">CO₂</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
-          <button
-            onClick={() => navigate('/activities')}
-            className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition text-left border-2 border-transparent hover:border-green-600"
-          >
-            <div className="text-3xl mb-2">📊</div>
-            <h3 className="text-lg font-bold text-gray-900 mb-1">View All Activities</h3>
-            <p className="text-sm text-gray-600">See your complete activity history</p>
-          </button>
+          {/* Quick Actions */}
+          <div className="space-y-4">
+            <button
+              onClick={() => navigate('/activities')}
+              className="w-full bg-white rounded-lg shadow p-6 hover:shadow-lg transition text-left border-2 border-transparent hover:border-green-600"
+            >
+              <div className="text-3xl mb-2">📝</div>
+              <h3 className="text-lg font-bold text-gray-900 mb-1">Add Activity</h3>
+              <p className="text-sm text-gray-600">Track new emissions</p>
+            </button>
 
-          <div className="bg-green-700 text-white rounded-lg shadow p-6">
-            <div className="text-3xl mb-2">🎯</div>
-            <h3 className="text-lg font-bold mb-1">Your Goal</h3>
-            <p className="text-sm text-green-100">Reduce emissions by 20% this month</p>
+            <div className="bg-green-700 text-white rounded-lg shadow p-6">
+              <div className="text-3xl mb-2">🎯</div>
+              <h3 className="text-lg font-bold mb-1">Monthly Goal</h3>
+              <p className="text-sm text-green-100">Reduce by 20%</p>
+              <div className="mt-3 bg-green-800 rounded-full h-2">
+                <div className="bg-white h-2 rounded-full" style={{width: '45%'}}></div>
+              </div>
+              <p className="text-xs text-green-100 mt-1">45% achieved</p>
+            </div>
+
+            <div className="bg-blue-600 text-white rounded-lg shadow p-6">
+              <div className="text-3xl mb-2">🏆</div>
+              <h3 className="text-lg font-bold mb-1">Your Rank</h3>
+              <p className="text-sm text-blue-100">Top 30% eco-friendly</p>
+            </div>
           </div>
         </div>
       </div>
