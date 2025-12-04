@@ -188,32 +188,32 @@ export default function Activities() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center">
-        <div className="text-2xl text-green-600">Loading...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-xl text-gray-700">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <nav className="bg-white shadow-lg border-b-4 border-green-500">
+      <nav className="bg-green-800 shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center space-x-3">
-              <span className="text-3xl">🌱</span>
-              <h1 className="text-2xl font-bold text-green-700">GreenTrack</h1>
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl">🌱</span>
+              <h1 className="text-xl font-bold text-white">GreenTrack</h1>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
               <button
                 onClick={() => navigate('/dashboard')}
-                className="text-green-600 hover:text-green-700 font-medium"
+                className="text-white hover:text-gray-200"
               >
                 Dashboard
               </button>
               <button
                 onClick={handleLogout}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+                className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800 transition"
               >
                 Logout
               </button>
@@ -222,22 +222,22 @@ export default function Activities() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Filters and Search */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-lg shadow p-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
             <input
               type="text"
               placeholder="Search activities..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              className="px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-600 focus:border-green-600 text-sm"
             />
             
             <select
               value={type}
               onChange={(e) => { setType(e.target.value); setPage(1); }}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              className="px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-600 focus:border-green-600 text-sm"
             >
               <option value="">All Types</option>
               <option value="travel">Travel</option>
@@ -248,7 +248,7 @@ export default function Activities() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              className="px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-600 focus:border-green-600 text-sm"
             >
               <option value="date">Sort by Date</option>
               <option value="carbonCO2">Sort by CO₂</option>
@@ -258,7 +258,7 @@ export default function Activities() {
             <select
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              className="px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-600 focus:border-green-600 text-sm"
             >
               <option value="desc">Descending</option>
               <option value="asc">Ascending</option>
@@ -267,60 +267,60 @@ export default function Activities() {
 
           <button
             onClick={() => { setShowModal(true); setEditingActivity(null); resetForm(); }}
-            className="mt-4 w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-semibold shadow-lg"
+            className="w-full bg-green-700 text-white py-2 rounded hover:bg-green-800 transition font-medium"
           >
             + Add New Activity
           </button>
         </div>
 
         {/* Activities List */}
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
             Your Activities ({total})
           </h2>
 
           {activities.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
-              <p className="text-xl">No activities found</p>
-              <p className="mt-2">Start tracking your carbon footprint!</p>
+              <p className="text-lg">No activities found</p>
+              <p className="mt-1 text-sm">Start tracking your carbon footprint!</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {activities.map((activity) => (
                 <div
                   key={activity.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
+                  className="border border-gray-200 rounded p-4 hover:border-green-600 transition"
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <span className="text-2xl">{getTypeIcon(activity.type)}</span>
+                      <div className="flex items-center space-x-2 mb-2">
+                        <span className="text-xl">{getTypeIcon(activity.type)}</span>
                         <div>
-                          <h3 className="text-lg font-semibold text-gray-800">{activity.name}</h3>
-                          <span className={`text-xs px-2 py-1 rounded-full ${getTypeColor(activity.type)}`}>
+                          <h3 className="text-base font-semibold text-gray-900">{activity.name}</h3>
+                          <span className={`text-xs px-2 py-0.5 rounded ${getTypeColor(activity.type)}`}>
                             {activity.type}
                           </span>
                         </div>
                       </div>
                       {activity.description && (
-                        <p className="text-gray-600 text-sm mb-2">{activity.description}</p>
+                        <p className="text-gray-600 text-sm mb-2 ml-7">{activity.description}</p>
                       )}
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                        <span>📏 {activity.amount} {activity.unit}</span>
-                        <span className="font-semibold text-red-600">💨 {activity.carbonCO2} kg CO₂</span>
-                        <span>📅 {new Date(activity.date).toLocaleDateString()}</span>
+                      <div className="flex flex-wrap gap-3 text-sm text-gray-700 ml-7">
+                        <span>{activity.amount} {activity.unit}</span>
+                        <span className="font-semibold text-red-700">{activity.carbonCO2} kg CO₂</span>
+                        <span className="text-gray-500">{new Date(activity.date).toLocaleDateString()}</span>
                       </div>
                     </div>
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleEdit(activity)}
-                        className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-sm"
+                        className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition text-sm"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDelete(activity.id)}
-                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition text-sm"
+                        className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 transition text-sm"
                       >
                         Delete
                       </button>
@@ -333,21 +333,21 @@ export default function Activities() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center items-center space-x-2 mt-6">
+            <div className="flex justify-center items-center space-x-3 mt-6">
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-green-700 transition"
+                className="px-4 py-2 bg-green-700 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-green-800 transition"
               >
                 Previous
               </button>
-              <span className="text-gray-700 font-medium">
+              <span className="text-gray-900 font-medium">
                 Page {page} of {totalPages}
               </span>
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-green-700 transition"
+                className="px-4 py-2 bg-green-700 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-green-800 transition"
               >
                 Next
               </button>
@@ -359,18 +359,18 @@ export default function Activities() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
               {editingActivity ? 'Edit Activity' : 'Add New Activity'}
             </h2>
             
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Type</label>
+                <label className="block text-sm font-medium text-gray-900 mb-1">Type</label>
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({...formData, type: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-600 text-sm"
                   required
                 >
                   <option value="travel">Travel</option>
@@ -380,85 +380,85 @@ export default function Activities() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Name</label>
+                <label className="block text-sm font-medium text-gray-900 mb-1">Name</label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-600 text-sm"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                <label className="block text-sm font-medium text-gray-900 mb-1">Description</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-600 text-sm"
                   rows={2}
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Amount</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Amount</label>
                   <input
                     type="number"
                     step="0.01"
                     value={formData.amount}
                     onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-600 text-sm"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Unit</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-1">Unit</label>
                   <input
                     type="text"
                     value={formData.unit}
                     onChange={(e) => setFormData({...formData, unit: e.target.value})}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-600 text-sm"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">CO₂ Emissions (kg)</label>
+                <label className="block text-sm font-medium text-gray-900 mb-1">CO₂ Emissions (kg)</label>
                 <input
                   type="number"
                   step="0.01"
                   value={formData.carbonCO2}
                   onChange={(e) => setFormData({...formData, carbonCO2: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-600 text-sm"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Date</label>
+                <label className="block text-sm font-medium text-gray-900 mb-1">Date</label>
                 <input
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({...formData, date: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-600 text-sm"
                   required
                 />
               </div>
 
-              <div className="flex space-x-3 mt-6">
+              <div className="flex space-x-3 mt-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition font-semibold"
+                  className="flex-1 bg-green-700 text-white py-2 rounded hover:bg-green-800 transition font-medium"
                 >
                   {editingActivity ? 'Update' : 'Create'}
                 </button>
                 <button
                   type="button"
                   onClick={() => { setShowModal(false); setEditingActivity(null); resetForm(); }}
-                  className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition font-semibold"
+                  className="flex-1 bg-gray-600 text-white py-2 rounded hover:bg-gray-700 transition font-medium"
                 >
                   Cancel
                 </button>
