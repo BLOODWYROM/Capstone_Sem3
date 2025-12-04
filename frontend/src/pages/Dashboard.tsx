@@ -137,9 +137,21 @@ export default function Dashboard() {
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => navigate('/activities')}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+                className="text-white hover:text-gray-200"
               >
-                My Activities
+                Activities
+              </button>
+              <button
+                onClick={() => navigate('/analytics')}
+                className="text-white hover:text-gray-200"
+              >
+                Analytics
+              </button>
+              <button
+                onClick={() => navigate('/profile')}
+                className="text-white hover:text-gray-200"
+              >
+                Profile
               </button>
               <button
                 onClick={handleLogout}

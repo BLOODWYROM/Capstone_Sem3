@@ -294,6 +294,18 @@ export default function Activities() {
                 Dashboard
               </button>
               <button
+                onClick={() => navigate('/analytics')}
+                className="text-white hover:text-gray-200"
+              >
+                Analytics
+              </button>
+              <button
+                onClick={() => navigate('/profile')}
+                className="text-white hover:text-gray-200"
+              >
+                Profile
+              </button>
+              <button
                 onClick={handleLogout}
                 className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800 transition"
               >
