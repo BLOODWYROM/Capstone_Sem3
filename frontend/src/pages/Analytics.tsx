@@ -186,7 +186,7 @@ export default function Analytics() {
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <h2 className="text-lg font-bold text-gray-900 mb-6">Monthly CO₂ Emissions ({selectedYear})</h2>
           <div className="flex items-end justify-between h-64 border-b-2 border-l-2 border-gray-300 px-4 pb-2">
-            {monthlyData.map((month, index) => {
+            {monthlyData.map((month) => {
               const heightPercent = maxCO2 > 0 ? (month.co2 / maxCO2) * 100 : 0;
               const barColor = month.co2 === 0 ? 'bg-gray-200' : 
                               month.co2 < 50 ? 'bg-green-500' : 
