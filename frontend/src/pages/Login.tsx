@@ -114,32 +114,33 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Right Side - Gradient Background */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700 items-center justify-center p-12 relative overflow-hidden">
-        <div className="absolute inset-0 bg-black opacity-10"></div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-        
-        <div className="relative z-10 text-white text-center">
-          <h2 className="text-5xl font-bold mb-6">Hello, Friend!</h2>
-          <p className="text-xl mb-8 text-blue-100">Enter your details and start your journey with us</p>
+      {/* Right Side - Info */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-700 to-green-600 items-center justify-center p-12">
+        <div className="text-white max-w-md">
+          <div className="text-6xl mb-6">🌱</div>
+          <h2 className="text-4xl font-bold mb-4">GreenTrack</h2>
+          <p className="text-xl mb-8 text-green-100">Your Personal Carbon Footprint Tracker</p>
+          
           <div className="space-y-4">
-            <div className="flex items-center justify-center space-x-2">
-              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                  <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                </svg>
+            <div className="flex items-start space-x-3">
+              <div className="text-2xl">📊</div>
+              <div>
+                <h3 className="font-bold text-lg">Track Your Impact</h3>
+                <p className="text-green-100 text-sm">Monitor carbon emissions from travel, food, and energy use</p>
               </div>
-              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
-                </svg>
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="text-2xl">📈</div>
+              <div>
+                <h3 className="font-bold text-lg">Analyze Trends</h3>
+                <p className="text-green-100 text-sm">View detailed statistics and monthly comparisons</p>
               </div>
-              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                </svg>
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="text-2xl">🌍</div>
+              <div>
+                <h3 className="font-bold text-lg">Make a Difference</h3>
+                <p className="text-green-100 text-sm">Reduce your environmental impact with actionable insights</p>
               </div>
             </div>
           </div>

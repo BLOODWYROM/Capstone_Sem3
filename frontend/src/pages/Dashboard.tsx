@@ -1,8 +1,29 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../config';
+
+interface Stats {
+  totalActivities: number;
+  totalCO2: number;
+  travelCO2: number;
+  foodCO2: number;
+  energyCO2: number;
+  thisMonthCO2: number;
+  lastMonthCO2: number;
+}
 
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
+  const [stats, setStats] = useState<Stats>({
+    totalActivities: 0,
+    totalCO2: 0,
+    travelCO2: 0,
+    foodCO2: 0,
+    energyCO2: 0,
+    thisMonthCO2: 0,
+    lastMonthCO2: 0
+  });
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,7 +36,53 @@ export default function Dashboard() {
     }
 
     setUser(JSON.parse(userData));
+    fetchStats(token);
   }, [navigate]);
+
+  const fetchStats = async (token: string) => {
+    try {
+      const response = await fetch(`${API_URL}/api/activities?limit=1000`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!response.ok) throw new Error('Failed to fetch');
+
+      const data = await response.json();
+      const activities = data.activities;
+
+      // Calculate stats
+      const totalCO2 = activities.reduce((sum: number, a: any) => sum + a.carbonCO2, 0);
+      const travelCO2 = activities.filter((a: any) => a.type === 'travel').reduce((sum: number, a: any) => sum + a.carbonCO2, 0);
+      const foodCO2 = activities.filter((a: any) => a.type === 'food').reduce((sum: number, a: any) => sum + a.carbonCO2, 0);
+      const energyCO2 = activities.filter((a: any) => a.type === 'energy').reduce((sum: number, a: any) => sum + a.carbonCO2, 0);
+
+      const now = new Date();
+      const thisMonth = activities.filter((a: any) => {
+        const date = new Date(a.date);
+        return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+      }).reduce((sum: number, a: any) => sum + a.carbonCO2, 0);
+
+      const lastMonth = activities.filter((a: any) => {
+        const date = new Date(a.date);
+        const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1);
+        return date.getMonth() === lastMonthDate.getMonth() && date.getFullYear() === lastMonthDate.getFullYear();
+      }).reduce((sum: number, a: any) => sum + a.carbonCO2, 0);
+
+      setStats({
+        totalActivities: activities.length,
+        totalCO2: Math.round(totalCO2 * 100) / 100,
+        travelCO2: Math.round(travelCO2 * 100) / 100,
+        foodCO2: Math.round(foodCO2 * 100) / 100,
+        energyCO2: Math.round(energyCO2 * 100) / 100,
+        thisMonthCO2: Math.round(thisMonth * 100) / 100,
+        lastMonthCO2: Math.round(lastMonth * 100) / 100
+      });
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -23,7 +90,19 @@ export default function Dashboard() {
     navigate('/login');
   };
 
-  if (!user) return null;
+  if (!user || loading) return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-xl text-gray-700">Loading...</div>
+    </div>
+  );
+
+  const changePercent = stats.lastMonthCO2 > 0 
+    ? Math.round(((stats.thisMonthCO2 - stats.lastMonthCO2) / stats.lastMonthCO2) * 100)
+    : 0;
+
+  const travelPercent = stats.totalCO2 > 0 ? Math.round((stats.travelCO2 / stats.totalCO2) * 100) : 0;
+  const foodPercent = stats.totalCO2 > 0 ? Math.round((stats.foodCO2 / stats.totalCO2) * 100) : 0;
+  const energyPercent = stats.totalCO2 > 0 ? Math.round((stats.energyCO2 / stats.totalCO2) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -52,52 +131,152 @@ export default function Dashboard() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome, {user.name || 'User'}!</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="border border-gray-200 p-4 rounded">
-              <p className="text-sm text-gray-600 mb-1">Name</p>
-              <p className="text-lg font-semibold text-gray-900">{user.name || 'Not provided'}</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-green-700 to-green-600 text-white rounded-lg shadow-lg p-8 mb-6">
+          <h1 className="text-3xl font-bold mb-2">Welcome back, {user.name || 'User'}! 👋</h1>
+          <p className="text-green-100 text-lg">Track, analyze, and reduce your carbon footprint</p>
+        </div>
+
+        {/* Key Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-lg shadow p-6 border-l-4 border-green-600">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Total CO₂ Emissions</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.totalCO2}</p>
+                <p className="text-xs text-gray-500 mt-1">kg CO₂</p>
+              </div>
+              <div className="text-4xl">💨</div>
             </div>
-            <div className="border border-gray-200 p-4 rounded">
-              <p className="text-sm text-gray-600 mb-1">Email</p>
-              <p className="text-lg font-semibold text-gray-900">{user.email}</p>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6 border-l-4 border-blue-600">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Total Activities</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.totalActivities}</p>
+                <p className="text-xs text-gray-500 mt-1">tracked</p>
+              </div>
+              <div className="text-4xl">📊</div>
             </div>
-            <div className="border border-gray-200 p-4 rounded">
-              <p className="text-sm text-gray-600 mb-1">User ID</p>
-              <p className="text-lg font-semibold text-gray-900">{user.id.slice(0, 8)}...</p>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6 border-l-4 border-orange-600">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">This Month</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.thisMonthCO2}</p>
+                <p className="text-xs text-gray-500 mt-1">kg CO₂</p>
+              </div>
+              <div className="text-4xl">📅</div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6 border-l-4 border-red-600">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Monthly Change</p>
+                <p className={`text-3xl font-bold ${changePercent > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                  {changePercent > 0 ? '+' : ''}{changePercent}%
+                </p>
+                <p className="text-xs text-gray-500 mt-1">vs last month</p>
+              </div>
+              <div className="text-4xl">{changePercent > 0 ? '📈' : '📉'}</div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
-            <div className="text-4xl mb-3">🚗</div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Travel</h3>
-            <p className="text-gray-600 text-sm">Track transportation emissions</p>
+        {/* Emissions Breakdown */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Emissions by Category</h3>
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700">🚗 Travel</span>
+                  <span className="text-sm font-bold text-gray-900">{stats.travelCO2} kg ({travelPercent}%)</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div className="bg-blue-600 h-3 rounded-full" style={{width: `${travelPercent}%`}}></div>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700">🍽️ Food</span>
+                  <span className="text-sm font-bold text-gray-900">{stats.foodCO2} kg ({foodPercent}%)</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div className="bg-orange-600 h-3 rounded-full" style={{width: `${foodPercent}%`}}></div>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700">⚡ Energy</span>
+                  <span className="text-sm font-bold text-gray-900">{stats.energyCO2} kg ({energyPercent}%)</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div className="bg-yellow-600 h-3 rounded-full" style={{width: `${energyPercent}%`}}></div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
-            <div className="text-4xl mb-3">🍽️</div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Food</h3>
-            <p className="text-gray-600 text-sm">Monitor food carbon footprint</p>
-          </div>
-          <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
-            <div className="text-4xl mb-3">⚡</div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Energy</h3>
-            <p className="text-gray-600 text-sm">Measure energy consumption</p>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Environmental Impact</h3>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3 p-3 bg-green-50 rounded">
+                <span className="text-2xl">🌳</span>
+                <div>
+                  <p className="font-semibold text-gray-900">Trees Needed</p>
+                  <p className="text-sm text-gray-600">~{Math.ceil(stats.totalCO2 / 21)} trees to offset your emissions</p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3 p-3 bg-blue-50 rounded">
+                <span className="text-2xl">🚗</span>
+                <div>
+                  <p className="font-semibold text-gray-900">Driving Equivalent</p>
+                  <p className="text-sm text-gray-600">~{Math.round(stats.totalCO2 * 4.5)} km driven</p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3 p-3 bg-yellow-50 rounded">
+                <span className="text-2xl">💡</span>
+                <div>
+                  <p className="font-semibold text-gray-900">Energy Equivalent</p>
+                  <p className="text-sm text-gray-600">~{Math.round(stats.totalCO2 * 1.2)} kWh of electricity</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="bg-green-700 text-white rounded-lg shadow p-6 text-center">
-          <h3 className="text-xl font-bold mb-2">Start Tracking Your Carbon Footprint</h3>
-          <p className="mb-4 text-green-100">Every action counts towards a greener planet</p>
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <button
             onClick={() => navigate('/activities')}
-            className="bg-white text-green-700 px-6 py-2 rounded hover:bg-gray-100 transition font-semibold"
+            className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition text-left border-2 border-transparent hover:border-green-600"
           >
-            Go to Activities →
+            <div className="text-3xl mb-2">📝</div>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">Add Activity</h3>
+            <p className="text-sm text-gray-600">Track a new carbon emission activity</p>
           </button>
+
+          <button
+            onClick={() => navigate('/activities')}
+            className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition text-left border-2 border-transparent hover:border-green-600"
+          >
+            <div className="text-3xl mb-2">📊</div>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">View All Activities</h3>
+            <p className="text-sm text-gray-600">See your complete activity history</p>
+          </button>
+
+          <div className="bg-green-700 text-white rounded-lg shadow p-6">
+            <div className="text-3xl mb-2">🎯</div>
+            <h3 className="text-lg font-bold mb-1">Your Goal</h3>
+            <p className="text-sm text-green-100">Reduce emissions by 20% this month</p>
+          </div>
         </div>
       </div>
     </div>
