@@ -1,11 +1,12 @@
 services:
   - type: web
-    name: capstone-backend
+    name: greentrack-backend
     env: node
     region: oregon
     plan: free
-    buildCommand: cd backend && npm install --include=dev && npm run build && npx prisma migrate deploy
-    startCommand: cd backend && npm start
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate && npm run build && npx prisma migrate deploy
+    startCommand: npm start
     envVars:
       - key: DATABASE_URL
         sync: false
@@ -13,3 +14,5 @@ services:
         sync: false
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 10000
