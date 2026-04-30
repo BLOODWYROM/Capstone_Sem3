@@ -163,7 +163,7 @@ cp .env.example .env
 Create or update `frontend/src/config.ts`:
 
 ```typescript
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:9000';
 ```
 
 For production, create `.env` in the `frontend` directory:
@@ -214,7 +214,7 @@ cd backend
 npm run dev
 ```
 
-Backend will run on `http://localhost:5000`
+Backend will run on `http://localhost:9000`
 
 #### Start Frontend Development Server
 
